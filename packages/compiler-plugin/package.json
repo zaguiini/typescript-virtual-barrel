@@ -1,0 +1,34 @@
+{
+  "name": "@typescript-virtual-barrel/compiler-plugin",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "prepare": "ts-patch install -s",
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "TIMING=1 eslint src/**/*.ts* --fix",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.2",
+    "@types/node": "^18.7.1",
+    "eslint": "^7.32.0",
+    "eslint-config-custom": "*",
+    "jest": "^29.0.3",
+    "jest-diff": "^29.5.0",
+    "rimraf": "^4.4.0",
+    "ts-jest": "^29.0.1",
+    "ts-patch": "^2.1.0",
+    "tsconfig": "*"
+  },
+  "dependencies": {
+    "@typescript-virtual-barrel/core": "*",
+    "typescript": "^4.7.4"
+  }
+}

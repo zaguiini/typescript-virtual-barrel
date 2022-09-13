@@ -1,0 +1,1 @@
+src/index.ts(5,7): error TS2322: Type 'false' is not assignable to type 'true'.

@@ -1,0 +1,2 @@
+src/index.ts(1,10): error TS2305: Module '"./utils"' has no exported member 'myFunction'.
+src/utils/myFunction.ts(1,1): warning TS9999: Missing identifier for export. This member will not be included in the barrel.

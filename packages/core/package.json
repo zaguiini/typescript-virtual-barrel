@@ -1,0 +1,33 @@
+{
+  "name": "@typescript-virtual-barrel/core",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "TIMING=1 eslint src/**/*.ts* --fix",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/jest": "^29.0.2",
+    "@types/lodash": "^4.14.191",
+    "@types/node": "^18.7.1",
+    "eslint": "^7.32.0",
+    "eslint-config-custom": "*",
+    "jest": "^29.0.3",
+    "ts-jest": "^29.0.1",
+    "tsconfig": "*"
+  },
+  "dependencies": {
+    "camel-case": "^4.1.2",
+    "glob": "^8.0.3",
+    "typescript": "^4.7.4"
+  }
+}
