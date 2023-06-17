@@ -54,7 +54,7 @@ Not yet convinced? [Try the sample project](https://github.com/zaguiini/typescri
 You'll need to install three packages using your favorite package manager. Mine is Yarn:
 
 ```
-yarn add -D ts-patch @typescript-virtual-barrel/compiler-plugin @typescript-virtual-barrel/tsserver-plugin
+yarn add -D ts-patch @typescript-virtual-barrel/compiler-plugin @typescript-virtual-barrel/language-service-plugin
 ```
 
 ## Configuration
@@ -84,14 +84,14 @@ Open the `tsconfig.json` file and add the following entries to the `compilerOpti
         "transformProgram": true
       },
       {
-        "name": "@typescript-virtual-barrel/tsserver-plugin"
+        "name": "@typescript-virtual-barrel/language-service-plugin"
       }
     ]
   }
 }
 ```
 
-The reason that two plugins are added to your config file is that most IDEs are using a Language Server in the background to provide rich information (such as type assertions, import suggestions, go to definition, etc) for you, the developer. As the TypeScript compiler and Language Server are two different things, we need two different plugins to make it work as intended.
+The reason that two plugins are added to your config file is that most IDEs are using a Language Server in the background to provide rich information (such as type assertions, import suggestions, go to definition, etc) for you, the developer. As the TypeScript compiler and Language Service are two different things, we need two different plugins to make it work as intended.
 
 If you're using VSCode, make sure that the Language Server is using the local TypeScript installation. You can do that by creating a file called `.vscode/settings.json` in the root dir of your project with the following contents:
 

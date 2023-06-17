@@ -103,7 +103,7 @@ const tsConfig = {
   compilerOptions: {
     plugins: [
       {
-        name: '@typescript-virtual-barrel/tsserver-plugin',
+        name: '@typescript-virtual-barrel/language-service-plugin',
       },
     ],
     resolveJsonModule: true,
