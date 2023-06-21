@@ -17,28 +17,65 @@ describe('calculateBarrel', () => {
     )
   }
 
-  beforeAll(() => {
-    const program = typescript.createProgram(
-      getDirectoryFiles(
-        MODULES_FOLDER,
-        typescript.createProgram([], {
+  describe('ES modules', () => {
+    beforeAll(() => {
+      const program = typescript.createProgram(
+        getDirectoryFiles(
+          MODULES_FOLDER,
+          typescript.createProgram([], {
+            resolveJsonModule: true,
+          }),
+          typescript.sys.readDirectory
+        ),
+        {
           resolveJsonModule: true,
-        }),
-        typescript.sys.readDirectory
-      ),
-      {
-        resolveJsonModule: true,
-      }
-    )
+          module: typescript.ModuleKind.ESNext,
+          moduleResolution: typescript.ModuleResolutionKind.NodeNext,
+        }
+      )
 
-    barrel = calculateBarrel(
-      program,
-      MODULES_FOLDER,
-      typescript.sys.readDirectory
-    )
+      barrel = calculateBarrel(
+        program,
+        MODULES_FOLDER,
+        typescript.sys.readDirectory
+      )
+    })
+
+    it('adds output extension for typescript imports', () => {
+      expect(printStatement(0)).toEqual(
+        'export { default as NamedDefaultExport } from "./0-aliases-default-export.js";'
+      )
+    })
+
+    it('adds assert block after extraneous imports', () => {
+      expect(printStatement(barrel.sourceFile.statements.length - 1)).toEqual(
+        'export { default as zForwardsJson } from "./z-forwards.json" assert { type: "json" };'
+      )
+    })
   })
 
   describe('symbol forwarding', () => {
+    beforeAll(() => {
+      const program = typescript.createProgram(
+        getDirectoryFiles(
+          MODULES_FOLDER,
+          typescript.createProgram([], {
+            resolveJsonModule: true,
+          }),
+          typescript.sys.readDirectory
+        ),
+        {
+          resolveJsonModule: true,
+        }
+      )
+
+      barrel = calculateBarrel(
+        program,
+        MODULES_FOLDER,
+        typescript.sys.readDirectory
+      )
+    })
+
     it('aliases default export', () => {
       expect(printStatement(0)).toEqual(
         'export { default as NamedDefaultExport } from "./0-aliases-default-export";'
@@ -108,6 +145,27 @@ describe('calculateBarrel', () => {
   })
 
   describe('diagnostics', () => {
+    beforeAll(() => {
+      const program = typescript.createProgram(
+        getDirectoryFiles(
+          MODULES_FOLDER,
+          typescript.createProgram([], {
+            resolveJsonModule: true,
+          }),
+          typescript.sys.readDirectory
+        ),
+        {
+          resolveJsonModule: true,
+        }
+      )
+
+      barrel = calculateBarrel(
+        program,
+        MODULES_FOLDER,
+        typescript.sys.readDirectory
+      )
+    })
+
     it('does not include unnamed default export', () => {
       const unnamedDefaultExportDiagnostic = barrel.diagnostics.get(
         typescript.combinePaths(MODULES_FOLDER, 'unnamed-default-export.ts')
