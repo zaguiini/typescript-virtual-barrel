@@ -52,7 +52,7 @@ describe('getExportsOfSourceFile', () => {
         diagnostics: [],
         entities: [
           {
-            fileName: 'default-export',
+            fileName: 'default-export.ts',
             identifier: 'MyFunction',
             isDefaultExport: true,
             isTypeExport: false,
@@ -74,7 +74,7 @@ describe('getExportsOfSourceFile', () => {
         diagnostics: [],
         entities: [
           {
-            fileName: 'default-export-reference',
+            fileName: 'default-export-reference.ts',
             identifier: 'ReferenceToMyFunction',
             isDefaultExport: true,
             isTypeExport: false,
@@ -95,7 +95,7 @@ describe('getExportsOfSourceFile', () => {
         diagnostics: [],
         entities: [
           {
-            fileName: 'member-export',
+            fileName: 'member-export.ts',
             identifier: 'variable',
             isDefaultExport: false,
             isTypeExport: false,
@@ -118,7 +118,7 @@ describe('getExportsOfSourceFile', () => {
         diagnostics: [],
         entities: [
           {
-            fileName: 'named-export',
+            fileName: 'named-export.ts',
             identifier: 'namedVariable',
             isDefaultExport: false,
             isTypeExport: false,
@@ -141,7 +141,7 @@ describe('getExportsOfSourceFile', () => {
         diagnostics: [],
         entities: [
           {
-            fileName: 'aliased-named-export',
+            fileName: 'aliased-named-export.ts',
             identifier: 'anotherIdentifier',
             isDefaultExport: false,
             isTypeExport: false,
@@ -164,13 +164,13 @@ describe('getExportsOfSourceFile', () => {
         diagnostics: [],
         entities: [
           {
-            fileName: 'multiple-named-exports',
+            fileName: 'multiple-named-exports.ts',
             identifier: 'namedVariable',
             isDefaultExport: false,
             isTypeExport: false,
           },
           {
-            fileName: 'multiple-named-exports',
+            fileName: 'multiple-named-exports.ts',
             identifier: 'anotherIdentifier',
             isDefaultExport: false,
             isTypeExport: false,
@@ -193,7 +193,7 @@ describe('getExportsOfSourceFile', () => {
         diagnostics: [],
         entities: [
           {
-            fileName: 'export-default-enum',
+            fileName: 'export-default-enum.ts',
             identifier: 'MyEnum',
             isDefaultExport: true,
             isTypeExport: false,
@@ -216,7 +216,7 @@ describe('getExportsOfSourceFile', () => {
         diagnostics: [],
         entities: [
           {
-            fileName: 'exported-interface',
+            fileName: 'exported-interface.ts',
             identifier: 'MyInterface',
             isDefaultExport: false,
             isTypeExport: true,

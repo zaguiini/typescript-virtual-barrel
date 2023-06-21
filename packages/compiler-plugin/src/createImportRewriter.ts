@@ -8,6 +8,12 @@ import {
   ExportedEntities,
   ExportedEntity,
 } from '@typescript-virtual-barrel/core'
+import path from 'path'
+
+/**
+ * - import should have the extension, and it should be js, if esnext module. relevant function: typescript.getOutputExtension(entity.fileName, compilerOptions
+ * - import should have the assert clause if esnext module
+ */
 
 const createImport = ({
   importSpecifier,
@@ -28,12 +34,18 @@ const createImport = ({
       : factory.createNamedImports([importSpecifier])
   )
 
+  const extension = path.extname(exportFromBarrel.fileName)
+  const fileNameWithoutExtension = path.basename(
+    exportFromBarrel.fileName,
+    extension
+  )
+
   return factory.createImportDeclaration(
     undefined,
     undefined,
     importClause,
     factory.createStringLiteral(
-      `${moduleSpecifier}/${exportFromBarrel.fileName}`
+      `${moduleSpecifier}/${fileNameWithoutExtension}`
     )
   )
 }
