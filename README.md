@@ -144,11 +144,6 @@ Notice how, in the GIF, I'm getting symbols ready to be imported. That's right: 
 
 And of course, you can compile your project, just like you normally would: `tsc`. It will create the distribution version, either transforming the imports or [keeping the generated barrel file if you wish](#options).
 
-## Known issues
-
-- `.json` files are not yet working with `ESNext` module resolution
-- `.js` extension is not added to the imported files when using Node's ES Modules
-
 ## License
 
 MIT
