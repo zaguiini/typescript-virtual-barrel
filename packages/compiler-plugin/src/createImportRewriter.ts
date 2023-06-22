@@ -10,19 +10,16 @@ import {
 } from '@typescript-virtual-barrel/core'
 import path from 'path'
 
-/**
- * - import should have the extension, and it should be js, if esnext module. relevant function: typescript.getOutputExtension(entity.fileName, compilerOptions
- * - import should have the assert clause if esnext module
- */
-
 const createImport = ({
   importSpecifier,
   exportFromBarrel,
-  moduleSpecifier,
+  barrelLocation,
+  compilerOptions,
 }: {
   importSpecifier: typescript.ImportSpecifier
   exportFromBarrel: ExportedEntity
-  moduleSpecifier: string
+  barrelLocation: string
+  compilerOptions: typescript.CompilerOptions
 }) => {
   const { factory } = typescript
 
@@ -34,26 +31,63 @@ const createImport = ({
       : factory.createNamedImports([importSpecifier])
   )
 
-  const extension = path.extname(exportFromBarrel.fileName)
+  const extension = typescript.extensionFromPath(exportFromBarrel.fileName)
   const fileNameWithoutExtension = path.basename(
     exportFromBarrel.fileName,
     extension
   )
 
+  const isExtraneousExtension = !typescript.extensionIsTS(extension)
+  const isESNextModule = compilerOptions.module === typescript.ModuleKind.ESNext
+  const isNodeESModuleResolution =
+    compilerOptions.moduleResolution ===
+      typescript.ModuleResolutionKind.Node16 ||
+    compilerOptions.moduleResolution ===
+      typescript.ModuleResolutionKind.NodeNext
+  const shouldAddAssertClause = isExtraneousExtension && isESNextModule
+
+  let moduleSpecifier = isExtraneousExtension
+    ? exportFromBarrel.fileName
+    : isNodeESModuleResolution
+    ? `${fileNameWithoutExtension}${typescript.getOutputExtension(
+        exportFromBarrel.fileName,
+        compilerOptions
+      )}`
+    : fileNameWithoutExtension
+
+  if (isNodeESModuleResolution) {
+    moduleSpecifier = typescript.combinePaths(
+      path.dirname(barrelLocation),
+      moduleSpecifier
+    )
+  } else {
+    moduleSpecifier = typescript.combinePaths(barrelLocation, moduleSpecifier)
+  }
+
   return factory.createImportDeclaration(
     undefined,
     undefined,
     importClause,
-    factory.createStringLiteral(
-      `${moduleSpecifier}/${fileNameWithoutExtension}`
-    )
+    factory.createStringLiteral(moduleSpecifier),
+    shouldAddAssertClause
+      ? factory.createAssertClause(
+          factory.createNodeArray([
+            factory.createAssertEntry(
+              factory.createIdentifier('type'),
+              factory.createStringLiteral(extension.substring(1))
+            ),
+          ]),
+          false
+        )
+      : undefined
   )
 }
 
 const expandNamedImports = (
   namedImports: typescript.NamedImports,
-  moduleSpecifier: string,
-  barrelEntities: ExportedEntities
+  barrelLocation: string,
+  barrelEntities: ExportedEntities,
+  compilerOptions: typescript.CompilerOptions
 ) => {
   return namedImports.elements
     .filter(
@@ -67,15 +101,17 @@ const expandNamedImports = (
       return createImport({
         importSpecifier: element,
         exportFromBarrel,
-        moduleSpecifier,
+        barrelLocation,
+        compilerOptions,
       })
     })
 }
 
 const expandNamespaceImport = (
   namespaceIdentifier: string,
-  moduleSpecifier: string,
-  barrelEntities: ExportedEntities
+  barrelLocation: string,
+  barrelEntities: ExportedEntities,
+  compilerOptions: typescript.CompilerOptions
 ) => {
   const expandedImportDeclarations = Object.keys(barrelEntities).map(
     (element) => {
@@ -90,7 +126,8 @@ const expandNamespaceImport = (
           )
         ),
         exportFromBarrel,
-        moduleSpecifier,
+        barrelLocation,
+        compilerOptions,
       })
     }
   )
@@ -213,7 +250,8 @@ export function createImportRewriter({
               expandNamedImports(
                 node.importClause.namedBindings,
                 node.moduleSpecifier.text,
-                barrelEntities
+                barrelEntities,
+                compilerOptions
               )
             )
           }
@@ -233,7 +271,8 @@ export function createImportRewriter({
               expandNamespaceImport(
                 node.importClause.namedBindings.name.text,
                 node.moduleSpecifier.text,
-                barrelEntities
+                barrelEntities,
+                compilerOptions
               )
             )
           }

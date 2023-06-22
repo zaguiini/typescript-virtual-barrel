@@ -1,4 +1,4 @@
-import { Container, useButton } from './components'
+import { Container, useButton } from './components/index.js'
 
 Container()
 useButton()
