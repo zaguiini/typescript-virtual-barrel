@@ -92,7 +92,9 @@ function init() {
       const hasUpdatedBarrel = updateExistingBarrels()
 
       if (hasUpdatedBarrel) {
-        return updateGraph()
+        setTimeout(() => updateGraph(), 0)
+
+        return updatedGraph
       }
 
       return updatedGraph
