@@ -1,5 +1,5 @@
-import { value as DoesntHaveIndexvalue } from "./does-not-have-index/a";
-import * as HasIndex from './has-index';
+import { value as DoesntHaveIndexvalue } from "./does-not-have-index/a.js";
+import * as HasIndex from './has-index/index.js';
 const DoesntHaveIndex = {
     value: DoesntHaveIndexvalue
 };

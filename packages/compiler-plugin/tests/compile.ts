@@ -15,7 +15,8 @@ export const getDirFiles = (dir: string): string[] => {
 
 export const compile = async (
   fixture: string,
-  transformerOptions: { shouldTransformImports?: boolean } = {}
+  transformerOptions: { shouldTransformImports?: boolean } = {},
+  compilerOptions: typescript.CompilerOptions = {}
 ) => {
   const fixtureDir = path.join(__dirname, '__fixtures__', fixture)
   const outDir = path.join(fixtureDir, 'expected')
@@ -23,6 +24,7 @@ export const compile = async (
   const options: typescript.CompilerOptions = {
     target: typescript.ScriptTarget.ESNext,
     outDir,
+    module: typescript.ModuleKind.ESNext,
     moduleResolution: typescript.ModuleResolutionKind.NodeNext,
     jsx: typescript.JsxEmit.Preserve,
     allowSyntheticDefaultImports: true,
@@ -35,6 +37,7 @@ export const compile = async (
         ...transformerOptions,
       },
     ],
+    ...compilerOptions,
   }
 
   const fileMap = new Map<string, string>()

@@ -1,4 +1,4 @@
-import fixturesusersJson from "./fixtures/users.json";
+import fixturesusersJson from "./fixtures/users.json" assert { type: "json" };
 const fixtures = {
     usersJson: fixturesusersJson
 };
