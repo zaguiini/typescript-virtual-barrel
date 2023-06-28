@@ -5,8 +5,10 @@ import typescript, {
   Node,
 } from 'typescript'
 import {
+  isESModule,
   ExportedEntities,
   ExportedEntity,
+  isNodeModernModuleResolution,
 } from '@typescript-virtual-barrel/core'
 import path from 'path'
 
@@ -38,31 +40,23 @@ const createImport = ({
   )
 
   const isExtraneousExtension = !typescript.extensionIsTS(extension)
-  const isESNextModule = compilerOptions.module === typescript.ModuleKind.ESNext
-  const isNodeESModuleResolution =
-    compilerOptions.moduleResolution ===
-      typescript.ModuleResolutionKind.Node16 ||
-    compilerOptions.moduleResolution ===
-      typescript.ModuleResolutionKind.NodeNext
-  const shouldAddAssertClause = isExtraneousExtension && isESNextModule
+  const shouldAddAssertClause =
+    isExtraneousExtension && isESModule(compilerOptions)
 
-  let moduleSpecifier = isExtraneousExtension
+  const isNodeModernResolution = isNodeModernModuleResolution(compilerOptions)
+
+  const moduleName = isExtraneousExtension
     ? exportFromBarrel.fileName
-    : isNodeESModuleResolution
+    : isNodeModernResolution
     ? `${fileNameWithoutExtension}${typescript.getOutputExtension(
         exportFromBarrel.fileName,
         compilerOptions
       )}`
     : fileNameWithoutExtension
 
-  if (isNodeESModuleResolution) {
-    moduleSpecifier = typescript.combinePaths(
-      path.dirname(barrelLocation),
-      moduleSpecifier
-    )
-  } else {
-    moduleSpecifier = typescript.combinePaths(barrelLocation, moduleSpecifier)
-  }
+  const moduleSpecifier = isNodeModernResolution
+    ? typescript.combinePaths(path.dirname(barrelLocation), moduleName)
+    : typescript.combinePaths(barrelLocation, moduleName)
 
   return factory.createImportDeclaration(
     undefined,

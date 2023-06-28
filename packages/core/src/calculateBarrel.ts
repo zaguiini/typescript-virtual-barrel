@@ -7,6 +7,7 @@ import {
 } from './getExportsOfSourceFile'
 import { camelCase } from 'camel-case'
 import { getDirectoryFiles } from './getDirectoryFiles'
+import { isESModule, isNodeModernModuleResolution } from './utils'
 
 type Identifier = string
 
@@ -36,17 +37,13 @@ const transformToExportDeclaration = (
   const fileNameWithoutExtension = path.basename(entity.fileName, extension)
 
   const isExtraneousExtension = !typescript.extensionIsTS(extension)
-  const isESNextModule = compilerOptions.module === typescript.ModuleKind.ESNext
-  const isESModuleResolution =
-    compilerOptions.moduleResolution ===
-      typescript.ModuleResolutionKind.Node16 ||
-    compilerOptions.moduleResolution ===
-      typescript.ModuleResolutionKind.NodeNext
-  const shouldAddAssertClause = isExtraneousExtension && isESNextModule
+
+  const shouldAddAssertClause =
+    isExtraneousExtension && isESModule(compilerOptions)
 
   const moduleSpecifier = isExtraneousExtension
     ? `./${entity.fileName}`
-    : isESModuleResolution
+    : isNodeModernModuleResolution(compilerOptions)
     ? `./${fileNameWithoutExtension}${typescript.getOutputExtension(
         entity.fileName,
         compilerOptions
