@@ -5,18 +5,23 @@ import typescript, {
   Node,
 } from 'typescript'
 import {
+  isESModule,
   ExportedEntities,
   ExportedEntity,
+  isNodeModernModuleResolution,
 } from '@typescript-virtual-barrel/core'
+import path from 'path'
 
 const createImport = ({
   importSpecifier,
   exportFromBarrel,
-  moduleSpecifier,
+  barrelLocation,
+  compilerOptions,
 }: {
   importSpecifier: typescript.ImportSpecifier
   exportFromBarrel: ExportedEntity
-  moduleSpecifier: string
+  barrelLocation: string
+  compilerOptions: typescript.CompilerOptions
 }) => {
   const { factory } = typescript
 
@@ -28,20 +33,55 @@ const createImport = ({
       : factory.createNamedImports([importSpecifier])
   )
 
+  const extension = typescript.extensionFromPath(exportFromBarrel.fileName)
+  const fileNameWithoutExtension = path.basename(
+    exportFromBarrel.fileName,
+    extension
+  )
+
+  const isExtraneousExtension = !typescript.extensionIsTS(extension)
+  const shouldAddAssertClause =
+    isExtraneousExtension && isESModule(compilerOptions)
+
+  const isNodeModernResolution = isNodeModernModuleResolution(compilerOptions)
+
+  const moduleName = isExtraneousExtension
+    ? exportFromBarrel.fileName
+    : isNodeModernResolution
+    ? `${fileNameWithoutExtension}${typescript.getOutputExtension(
+        exportFromBarrel.fileName,
+        compilerOptions
+      )}`
+    : fileNameWithoutExtension
+
+  const moduleSpecifier = isNodeModernResolution
+    ? typescript.combinePaths(path.dirname(barrelLocation), moduleName)
+    : typescript.combinePaths(barrelLocation, moduleName)
+
   return factory.createImportDeclaration(
     undefined,
     undefined,
     importClause,
-    factory.createStringLiteral(
-      `${moduleSpecifier}/${exportFromBarrel.fileName}`
-    )
+    factory.createStringLiteral(moduleSpecifier),
+    shouldAddAssertClause
+      ? factory.createAssertClause(
+          factory.createNodeArray([
+            factory.createAssertEntry(
+              factory.createIdentifier('type'),
+              factory.createStringLiteral(extension.substring(1))
+            ),
+          ]),
+          false
+        )
+      : undefined
   )
 }
 
 const expandNamedImports = (
   namedImports: typescript.NamedImports,
-  moduleSpecifier: string,
-  barrelEntities: ExportedEntities
+  barrelLocation: string,
+  barrelEntities: ExportedEntities,
+  compilerOptions: typescript.CompilerOptions
 ) => {
   return namedImports.elements
     .filter(
@@ -55,15 +95,17 @@ const expandNamedImports = (
       return createImport({
         importSpecifier: element,
         exportFromBarrel,
-        moduleSpecifier,
+        barrelLocation,
+        compilerOptions,
       })
     })
 }
 
 const expandNamespaceImport = (
   namespaceIdentifier: string,
-  moduleSpecifier: string,
-  barrelEntities: ExportedEntities
+  barrelLocation: string,
+  barrelEntities: ExportedEntities,
+  compilerOptions: typescript.CompilerOptions
 ) => {
   const expandedImportDeclarations = Object.keys(barrelEntities).map(
     (element) => {
@@ -78,7 +120,8 @@ const expandNamespaceImport = (
           )
         ),
         exportFromBarrel,
-        moduleSpecifier,
+        barrelLocation,
+        compilerOptions,
       })
     }
   )
@@ -201,7 +244,8 @@ export function createImportRewriter({
               expandNamedImports(
                 node.importClause.namedBindings,
                 node.moduleSpecifier.text,
-                barrelEntities
+                barrelEntities,
+                compilerOptions
               )
             )
           }
@@ -221,7 +265,8 @@ export function createImportRewriter({
               expandNamespaceImport(
                 node.importClause.namedBindings.name.text,
                 node.moduleSpecifier.text,
-                barrelEntities
+                barrelEntities,
+                compilerOptions
               )
             )
           }

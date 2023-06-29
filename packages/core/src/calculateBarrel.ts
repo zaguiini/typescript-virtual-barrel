@@ -7,6 +7,7 @@ import {
 } from './getExportsOfSourceFile'
 import { camelCase } from 'camel-case'
 import { getDirectoryFiles } from './getDirectoryFiles'
+import { isESModule, isNodeModernModuleResolution } from './utils'
 
 type Identifier = string
 
@@ -28,10 +29,27 @@ const getEntityForExternalFile = (fileName: string) => {
   }
 }
 
-const transformToExportDeclaration = ({
-  identifier,
-  ...entity
-}: EntityWithIdentifier) => {
+const transformToExportDeclaration = (
+  { identifier, ...entity }: EntityWithIdentifier,
+  compilerOptions: typescript.CompilerOptions
+) => {
+  const extension = typescript.extensionFromPath(entity.fileName)
+  const fileNameWithoutExtension = path.basename(entity.fileName, extension)
+
+  const isExtraneousExtension = !typescript.extensionIsTS(extension)
+
+  const shouldAddAssertClause =
+    isExtraneousExtension && isESModule(compilerOptions)
+
+  const moduleSpecifier = isExtraneousExtension
+    ? `./${entity.fileName}`
+    : isNodeModernModuleResolution(compilerOptions)
+    ? `./${fileNameWithoutExtension}${typescript.getOutputExtension(
+        entity.fileName,
+        compilerOptions
+      )}`
+    : `./${fileNameWithoutExtension}`
+
   return factory.createExportDeclaration(
     undefined,
     undefined,
@@ -43,15 +61,29 @@ const transformToExportDeclaration = ({
         identifier
       ),
     ]),
-    factory.createStringLiteral(`./${entity.fileName}`)
+    factory.createStringLiteral(moduleSpecifier),
+    shouldAddAssertClause
+      ? factory.createAssertClause(
+          factory.createNodeArray([
+            factory.createAssertEntry(
+              factory.createIdentifier('type'),
+              factory.createStringLiteral(extension.substring(1))
+            ),
+          ]),
+          false
+        )
+      : undefined
   )
 }
 
 const transformEntitiesIntoExportDeclarations = (
-  entities: EntityWithIdentifier[]
+  entities: EntityWithIdentifier[],
+  compilerOptions: typescript.CompilerOptions
 ) => {
   return typescript.OrganizeImports.coalesceExports(
-    entities.map(transformToExportDeclaration)
+    entities.map((entity) =>
+      transformToExportDeclaration(entity, compilerOptions)
+    )
   )
 }
 
@@ -61,6 +93,7 @@ export const calculateBarrel = (
   readDirectory: typeof typescript.sys.readDirectory
 ) => {
   const checker = program.getTypeChecker()
+  const compilerOptions = program.getCompilerOptions()
 
   const includedFiles: string[] = []
   const diagnostics = new Map<string, typescript.DiagnosticWithLocation[]>()
@@ -75,11 +108,11 @@ export const calculateBarrel = (
     const sourceFile = typescript.createSourceFile(
       fileName,
       program.readFile?.(filePath) ?? 'export {};',
-      program.getCompilerOptions().target ?? typescript.ScriptTarget.ES3,
+      compilerOptions.target ?? typescript.ScriptTarget.ES3,
       true
     )
 
-    typescript.bindSourceFile(sourceFile, program.getCompilerOptions())
+    typescript.bindSourceFile(sourceFile, compilerOptions)
 
     return sourceFile
   }
@@ -115,7 +148,9 @@ export const calculateBarrel = (
     getDirectoryFiles(dirName, program, readDirectory).map(findEntitiesOfFile)
 
   const statements = barrelEntitiesGroupedByOrigin
-    .map(transformEntitiesIntoExportDeclarations)
+    .map((barrelEntities) =>
+      transformEntitiesIntoExportDeclarations(barrelEntities, compilerOptions)
+    )
     .flat()
 
   const sourceFile = factory.createSourceFile(

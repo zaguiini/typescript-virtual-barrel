@@ -88,13 +88,8 @@ export const getExportsOfSourceFile = ({ sourceFile, checker }: Options) => {
       typescript.isInterfaceDeclaration(declaration) ||
       typescript.isTypeAliasDeclaration(declaration)
 
-    const fileNameWithoutExt = path.basename(
-      sourceFile.fileName,
-      path.extname(sourceFile.fileName)
-    )
-
     result.entities.push({
-      fileName: fileNameWithoutExt,
+      fileName: path.basename(sourceFile.fileName),
       isDefaultExport: symbol.escapedName === 'default',
       isTypeExport,
       identifier,

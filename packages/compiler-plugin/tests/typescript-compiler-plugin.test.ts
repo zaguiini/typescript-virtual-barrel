@@ -13,6 +13,16 @@ const loadFixtureOptions = (fixtureDir: string) => {
   return {}
 }
 
+const loadCompilerOptions = (fixtureDir: string) => {
+  const filePath = path.resolve(fixtureDir, 'compilerOptions.json')
+
+  if (fs.existsSync(filePath)) {
+    return JSON.parse(fs.readFileSync(filePath).toString())
+  }
+
+  return {}
+}
+
 const getFixtures = () => {
   const directories = fs
     .readdirSync(path.resolve(__dirname, '__fixtures__'), {
@@ -24,18 +34,22 @@ const getFixtures = () => {
     name.replace(/-/g, ' '),
     name,
     loadFixtureOptions(path.join(__dirname, '__fixtures__', name)),
+    loadCompilerOptions(path.join(__dirname, '__fixtures__', name)),
   ])
 }
 
 describe('TypeScript Compiler plugin', () => {
   const fixtures = getFixtures()
 
-  it.concurrent.each(fixtures)('%s', async (_, fixture, options) => {
-    const compiled = await compile(fixture, options)
+  it.concurrent.each(fixtures)(
+    '%s',
+    async (_, fixture, pluginOptions, compilerOptions) => {
+      const compiled = await compile(fixture, pluginOptions, compilerOptions)
 
-    expect(compiled).toMatchOutput()
-    expect(compiled).toMatchDiagnostics()
-  })
+      expect(compiled).toMatchOutput()
+      expect(compiled).toMatchDiagnostics()
+    }
+  )
 })
 
 declare global {
