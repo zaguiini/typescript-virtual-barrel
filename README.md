@@ -144,6 +144,11 @@ Notice how, in the GIF, I'm getting symbols ready to be imported. That's right: 
 
 And of course, you can compile your project, just like you normally would: `tsc`. It will create the distribution version, either transforming the imports or [keeping the generated barrel file if you wish](#options).
 
+## Known issues
+
+- Not compatible with TypeScript 5.0
+- No `./barrel/index.js` completions when `moduleResolution` is set to `NodeNext`
+
 ## License
 
 MIT
