@@ -13,12 +13,15 @@ import { createBarrelUpdaterCallback } from './createBarrelUpdaterCallback'
 import { patchGetSemanticDiagnostics } from './patchGetSemanticDiagnostics'
 import { patchFindReferences } from './patchFindReferences'
 import { patchFindRenameLocations } from './patchFindRenameLocations'
+import { patchCompletions } from './patchCompletions'
 
 function init() {
   function create(info: tslibrary.server.PluginCreateInfo) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const logger = <T>(data: T) =>
       info.project.projectService.logger.info(util.inspect(data, true, 10))
+
+    console.log = logger
 
     const { rootFileNames, rootDir, projectDirs } = getProjectInfo(info)
 
@@ -119,6 +122,8 @@ function init() {
      */
     patchFindReferences(info, isVirtualFile)
     patchFindRenameLocations(info, isVirtualFile)
+
+    patchCompletions(info)
 
     return info.languageService
   }
