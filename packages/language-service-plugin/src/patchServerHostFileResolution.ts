@@ -78,9 +78,7 @@ export const patchServerHostFileResolution = ({
     )
 
     if (isIndexFile && isProjectDir && barrelDirExists) {
-      if (!isVirtualFile(barrelCandidate)) {
-        createBarrel(barrelCandidate)
-      }
+      createBarrel(barrelCandidate)
 
       return true
     }

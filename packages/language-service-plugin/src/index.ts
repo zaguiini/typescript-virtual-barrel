@@ -48,6 +48,19 @@ function init() {
         ),
     })
 
+    const createBarrelAndUpdateProject = (fileName: string) => {
+      upsertBarrel({
+        barrelName: fileName,
+        includedFiles: [],
+      })
+      setTimeout(() => info.project.updateGraph(), 0)
+    }
+
+    const deleteBarrelAndUpdateProject = (fileName: string) => {
+      deleteBarrel(fileName)
+      setTimeout(() => info.project.updateGraph(), 0)
+    }
+
     /**
      * The server host resolves the files. It is responsible for
      * looking through the files and folders of the project
@@ -58,16 +71,8 @@ function init() {
       rootDir,
       projectDirs,
       isVirtualFile,
-      deleteBarrel: (fileName) => {
-        deleteBarrel(fileName)
-        info.project.updateGraph()
-      },
-      createBarrel: (fileName) => {
-        upsertBarrel({
-          barrelName: fileName,
-          includedFiles: [],
-        })
-      },
+      createBarrel: createBarrelAndUpdateProject,
+      deleteBarrel: deleteBarrelAndUpdateProject,
     })
 
     /**
