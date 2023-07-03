@@ -57,6 +57,12 @@ function init() {
     }
 
     const deleteBarrelAndUpdateProject = (fileName: string) => {
+      const scriptInfo = info.project.getScriptInfo(fileName)
+
+      if (scriptInfo) {
+        info.project.removeFile(scriptInfo, false, true)
+      }
+
       deleteBarrel(fileName)
       setTimeout(() => info.project.updateGraph(), 0)
     }

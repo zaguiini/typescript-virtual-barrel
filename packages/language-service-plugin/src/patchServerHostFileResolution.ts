@@ -1,6 +1,7 @@
 import { patchMethod } from '@typescript-virtual-barrel/core'
 import path from 'path'
 import tslibrary from 'typescript/lib/tsserverlibrary'
+import { getOriginalCasedFileName } from './getOriginalCasedFileName'
 
 type PatchServerHostFileResolutionParameters = {
   serverHost: tslibrary.server.ServerHost
@@ -19,19 +20,25 @@ export const patchServerHostFileResolution = ({
   deleteBarrel,
   createBarrel,
 }: PatchServerHostFileResolutionParameters) => {
-  const getOriginalCasedFileName = (_fileName: string) => {
-    let fileName = _fileName.replace(rootDir, '')
+  patchMethod(serverHost, 'directoryExists', (original, dirName) => {
+    const directoryExists = original(dirName)
 
-    /**
-     * If the result is the same after replacing the rootDir for nothing,
-     * then this means the casing is different
-     */
-    if (fileName === _fileName) {
-      fileName = _fileName.replace(rootDir.toLowerCase(), '')
+    if (directoryExists) {
+      return true
     }
 
-    return path.join(rootDir, fileName)
-  }
+    const barrelCandidate = path.join(dirName, 'index.ts')
+
+    /**
+     * If the directory doesn't exist, but there is a leftover barrel
+     * in the registry, let's remove it.
+     */
+    if (isVirtualFile(barrelCandidate)) {
+      deleteBarrel(barrelCandidate)
+    }
+
+    return false
+  })
 
   patchMethod(serverHost, 'fileExists', (original, fileName) => {
     const result = original(fileName)
@@ -40,7 +47,7 @@ export const patchServerHostFileResolution = ({
      * If the file exists on the disk, let's remove the barrel and update the project
      */
     if (result) {
-      const barrelFile = getOriginalCasedFileName(fileName)
+      const barrelFile = getOriginalCasedFileName(fileName, rootDir)
 
       if (isVirtualFile(barrelFile)) {
         deleteBarrel(barrelFile)
@@ -49,7 +56,7 @@ export const patchServerHostFileResolution = ({
       return true
     }
 
-    const barrelCandidate = getOriginalCasedFileName(fileName)
+    const barrelCandidate = getOriginalCasedFileName(fileName, rootDir)
 
     /**
      * If a directory was just created, let's create a barrel for it
@@ -96,7 +103,7 @@ export const patchServerHostFileResolution = ({
       return result
     }
 
-    const barrelFile = getOriginalCasedFileName(fileName)
+    const barrelFile = getOriginalCasedFileName(fileName, rootDir)
 
     /**
      * If there is a barrel, let's return a valid module
