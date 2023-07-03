@@ -100,13 +100,7 @@ function init() {
     patchMethod(info.project, 'updateGraph', (updateGraph) => {
       const updatedGraph = updateGraph()
 
-      const hasUpdatedBarrel = updateExistingBarrels()
-
-      if (hasUpdatedBarrel) {
-        setTimeout(() => updateGraph(), 0)
-
-        return updatedGraph
-      }
+      updateExistingBarrels()
 
       return updatedGraph
     })

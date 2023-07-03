@@ -65,8 +65,6 @@ export const createBarrelUpdaterCallback = ({
   }
 
   const updateExistingBarrels = () => {
-    let hasUpdatedBarrel = false
-
     createdBarrels.forEach((_, barrelFileName) => {
       const scriptInfo = project.getScriptInfo(barrelFileName)
       const barrelDir = path.dirname(barrelFileName)
@@ -105,11 +103,7 @@ export const createBarrelUpdaterCallback = ({
         typescript.createPrinter().printFile(newBarrel.sourceFile) ||
           'export {};'
       )
-
-      hasUpdatedBarrel = true
     })
-
-    return hasUpdatedBarrel
   }
 
   return updateExistingBarrels
