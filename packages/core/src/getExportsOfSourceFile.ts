@@ -45,23 +45,22 @@ export const getExportsOfSourceFile = ({ sourceFile, checker }: Options) => {
     diagnostics: [],
   }
 
+  const supportedExtensions = typescript.getSupportedExtensions().flat()
+
   const sourceFileSymbol = checker.getSymbolAtLocation(sourceFile)
+
+  const isTsFile = supportedExtensions.includes(
+    path.extname(sourceFile.fileName) as typescript.Extension
+  )
 
   /**
    * Not a valid module.
    */
-  if (!sourceFileSymbol) {
+  if (!sourceFileSymbol && !isTsFile) {
     return null
   }
 
-  /**
-   * No exports in this file.
-   */
-  if (!sourceFileSymbol?.exports?.size) {
-    return result
-  }
-
-  sourceFileSymbol.exports.forEach((symbol) => {
+  sourceFileSymbol?.exports?.forEach((symbol) => {
     /**
      * The symbol doesn't have a declaration.
      */
