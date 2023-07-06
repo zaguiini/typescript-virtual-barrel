@@ -152,6 +152,11 @@ Notice how, in the GIF, I'm getting symbols ready to be imported. That's right: 
 
 And of course, you can compile your project, just like you normally would: `tsc`. It will create the distribution version, either transforming the imports or [keeping the generated barrel file if you wish](#options).
 
+## TO DO
+
+- Allow symbol renaiming
+- Allow symbol ignoring
+
 ## Known issues
 
 - Not compatible with TypeScript 5.0
