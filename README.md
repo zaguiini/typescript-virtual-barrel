@@ -154,8 +154,7 @@ And of course, you can compile your project, just like you normally would: `tsc`
 
 ## TO DO
 
-- Allow symbol renaiming
-- Allow symbol ignoring
+- Ignore symbols on demand with a `@ts-virtual-barrel-ignore` comment
 
 ## Known issues
 
