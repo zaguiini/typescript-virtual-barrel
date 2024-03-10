@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { PackageJson, TsConfigJson, JsonObject } from 'type-fest'
-import { fileExists, modifyJSON, run } from './utils.js'
+import { fileExists, determineTSVersion, modifyJSON, run } from './utils.js'
 import fs from 'fs/promises'
 import path from 'path'
 import ora from 'ora'
@@ -32,6 +32,15 @@ if (!isTypeScriptProject) {
 }
 
 spinner.info('tsconfig.json file found')
+
+const typeScriptVersion = await determineTSVersion()
+
+if (!typeScriptVersion) {
+  spinner.fail(
+    'Failed to determine TypeScript version. Please make sure you ran npm/yarn install first.'
+  )
+  process.exit(1)
+}
 
 spinner.start('Modifying package.json')
 
@@ -84,11 +93,17 @@ spinner.succeed('Plugins added to tsconfig.json')
 
 spinner.start('Installing dependencies\n')
 
-const packages = [
-  'ts-patch@^3',
-  '@typescript-virtual-barrel/compiler-plugin@latest',
-  '@typescript-virtual-barrel/language-service-plugin@latest',
-]
+const packages = typeScriptVersion.startsWith('5')
+  ? [
+      'ts-patch@^3',
+      '@typescript-virtual-barrel/compiler-plugin@latest',
+      '@typescript-virtual-barrel/language-service-plugin@latest',
+    ]
+  : [
+      'ts-patch@^2',
+      '@typescript-virtual-barrel/compiler-plugin@^0.0.3',
+      '@typescript-virtual-barrel/language-service-plugin@^0.0.7',
+    ]
 
 const installCommand = isYarn ? 'add' : 'install'
 const packageManager = isYarn ? 'yarn' : 'npm'
