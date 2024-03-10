@@ -60,7 +60,6 @@ const createImport = ({
 
   return factory.createImportDeclaration(
     undefined,
-    undefined,
     importClause,
     factory.createStringLiteral(moduleSpecifier),
     shouldAddAssertClause
@@ -179,7 +178,7 @@ const organizeImports = (imports: typescript.ImportDeclaration[]) => {
 
   return Object.values(importGroups)
     .map((importGroup) =>
-      typescript.OrganizeImports.coalesceImports(importGroup)
+      typescript.OrganizeImports.coalesceImports(importGroup, false)
     )
     .flat() as typescript.ImportDeclaration[]
 }

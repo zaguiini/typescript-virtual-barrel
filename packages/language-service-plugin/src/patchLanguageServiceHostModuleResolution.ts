@@ -17,7 +17,7 @@ export const patchLanguageServiceHostModuleResolution = ({
 }: PatchLanguageServiceHostModuleResolution) => {
   patchMethod(
     languageServiceHost,
-    'resolveModuleNames',
+    'resolveModuleNameLiterals',
     (original, moduleNames, containingFile, ...args) => {
       const result = original?.(moduleNames, containingFile, ...args)
 
@@ -33,7 +33,10 @@ export const patchLanguageServiceHostModuleResolution = ({
         }
 
         // This is necessary so it uses the patched serverHost that includes barrel files
-        const { resolvedModule } = resolveModuleName(moduleName, containingFile)
+        const { resolvedModule } = resolveModuleName(
+          moduleName.text.trim(),
+          containingFile
+        )
 
         if (resolvedModule) {
           return {

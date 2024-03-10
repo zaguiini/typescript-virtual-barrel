@@ -85,7 +85,7 @@ spinner.succeed('Plugins added to tsconfig.json')
 spinner.start('Installing dependencies\n')
 
 const packages = [
-  'ts-patch@^2',
+  'ts-patch@^3',
   '@typescript-virtual-barrel/compiler-plugin@latest',
   '@typescript-virtual-barrel/language-service-plugin@latest',
 ]

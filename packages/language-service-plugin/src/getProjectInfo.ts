@@ -4,7 +4,7 @@ import tslibrary from 'typescript/lib/tsserverlibrary'
 export const getProjectInfo = (info: tslibrary.server.PluginCreateInfo) => {
   const rootDir = info.project.getCurrentDirectory()
   const config = tslibrary.readConfigFile(
-    info.project.projectName,
+    info.project.getProjectName(),
     info.serverHost.readFile
   )
 
@@ -14,7 +14,7 @@ export const getProjectInfo = (info: tslibrary.server.PluginCreateInfo) => {
       info.serverHost,
       rootDir,
       info.project.getCompilerOptions(),
-      info.project.projectName
+      info.project.getProjectName()
     )
 
   return {

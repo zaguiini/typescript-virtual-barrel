@@ -28,7 +28,7 @@ export const patchGetSemanticDiagnostics = (
 
       const result = getExportsOfSourceFile({
         sourceFile: sourceFile as typescript.SourceFile,
-        checker: program.getTypeChecker() as typescript.TypeChecker,
+        checker: program.getTypeChecker() as unknown as typescript.TypeChecker,
       })
 
       const additionalDiagnostics = result?.diagnostics ?? []

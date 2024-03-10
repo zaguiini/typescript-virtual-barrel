@@ -52,7 +52,6 @@ const transformToExportDeclaration = (
 
   return factory.createExportDeclaration(
     undefined,
-    undefined,
     false,
     factory.createNamedExports([
       factory.createExportSpecifier(
@@ -83,7 +82,8 @@ const transformEntitiesIntoExportDeclarations = (
   return typescript.OrganizeImports.coalesceExports(
     entities.map((entity) =>
       transformToExportDeclaration(entity, compilerOptions)
-    )
+    ),
+    false
   )
 }
 

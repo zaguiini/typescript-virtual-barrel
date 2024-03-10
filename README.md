@@ -68,7 +68,7 @@ You can understand more about the installation process by reading the [manual in
 You'll need to install three packages using your favorite package manager. Mine is Yarn:
 
 ```
-yarn add -D ts-patch@^2.1 @typescript-virtual-barrel/compiler-plugin @typescript-virtual-barrel/language-service-plugin
+yarn add -D ts-patch@^3 @typescript-virtual-barrel/compiler-plugin @typescript-virtual-barrel/language-service-plugin
 ```
 
 With `ts-patch` installed, modify your `package.json` to include a `postinstall` script:
