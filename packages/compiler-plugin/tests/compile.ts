@@ -1,6 +1,7 @@
 import { readdirSync } from 'fs'
 import path from 'path'
 import typescript from 'typescript'
+import transformProgram from '../src'
 
 export const getDirFiles = (dir: string): string[] => {
   const dirents = readdirSync(dir, { withFileTypes: true })
@@ -29,34 +30,31 @@ export const compile = async (
     jsx: typescript.JsxEmit.Preserve,
     allowSyntheticDefaultImports: true,
     resolveJsonModule: true,
-    plugins: [
-      {
-        // @ts-expect-error This is a property from `ts-patch`.
-        transform: path.resolve(__dirname, '../src/index.ts'),
-        transformProgram: true,
-        ...transformerOptions,
-      },
-    ],
+    skipLibCheck: true,
     ...compilerOptions,
   }
 
   const fileMap = new Map<string, string>()
 
-  const host = typescript.createCompilerHost(options)
+  const host: typescript.CompilerHost = {
+    ...typescript.createCompilerHost(options),
+    writeFile: (fileName, content, ...args) => {
+      fileMap.set(fileName, content)
 
-  const program = typescript.createProgram({
-    rootNames: getDirFiles(path.join(fixtureDir, 'src')),
-    host: {
-      ...host,
-      writeFile: (fileName, content, ...args) => {
-        fileMap.set(fileName, content)
-
-        if (process.env.WRITE_TRANSFORMED_FILES) {
-          return host.writeFile(fileName, content, ...args)
-        }
-      },
+      if (process.env.WRITE_TRANSFORMED_FILES) {
+        return host.writeFile(fileName, content, ...args)
+      }
     },
+  }
+
+  let program = typescript.createProgram({
+    rootNames: getDirFiles(path.join(fixtureDir, 'src')),
+    host,
     options,
+  })
+
+  program = transformProgram(program, host, transformerOptions, {
+    ts: typescript,
   })
 
   program.emit()

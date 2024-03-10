@@ -9,9 +9,9 @@
     "eslint-config-turbo": "latest"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "typescript": "^4.7.4"
+    "typescript": "^5.4.2"
   },
   "publishConfig": {
     "access": "public"

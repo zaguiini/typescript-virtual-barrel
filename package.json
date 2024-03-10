@@ -13,7 +13,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@types/ts-expose-internals": "npm:ts-expose-internals@4.7.4",
+    "@types/ts-expose-internals": "npm:ts-expose-internals@5.4.2",
     "eslint-config-custom": "*",
     "prettier": "latest",
     "turbo": "latest"

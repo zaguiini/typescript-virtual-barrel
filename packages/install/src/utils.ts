@@ -1,5 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
+import { PackageJson } from 'type-fest'
 import { parse, stringify } from 'comment-json'
 import { spawn, SpawnOptions } from 'node:child_process'
 
@@ -56,4 +57,23 @@ export const modifyJSON = async <T>(
   callback(parsedContent as T)
 
   await fs.writeFile(filePath, stringify(parsedContent, null, 2))
+}
+
+export const determineTSVersion = async () => {
+  const tsPackageJson = path.join(
+    process.cwd(),
+    'node_modules',
+    'typescript',
+    'package.json'
+  )
+
+  if (!(await fileExists(tsPackageJson))) {
+    return
+  }
+
+  const { default: packageJson } = await import(tsPackageJson, {
+    assert: { type: 'json' },
+  })
+
+  return (packageJson as PackageJson).version
 }

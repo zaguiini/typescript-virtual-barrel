@@ -45,7 +45,7 @@ export const createBarrelUpdaterCallback = ({
 
     const directoryFiles = getDirectoryFiles(
       folderName,
-      program as typescript.Program,
+      program as unknown as typescript.Program,
       readDirectory
     )
 
@@ -87,7 +87,7 @@ export const createBarrelUpdaterCallback = ({
       }
 
       const newBarrel = calculateBarrel(
-        getProgram() as typescript.Program,
+        getProgram() as unknown as typescript.Program,
         path.dirname(barrelFileName),
         readDirectory
       )
