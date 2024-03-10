@@ -1,6 +1,6 @@
 {
   "name": "@typescript-virtual-barrel/compiler-plugin",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -26,7 +26,7 @@
     "tsconfig": "*"
   },
   "dependencies": {
-    "@typescript-virtual-barrel/core": "^0.0.3",
+    "@typescript-virtual-barrel/core": ">=1.0.0",
     "ts-patch": "^3.1.2",
     "typescript": "^5.4.2"
   }

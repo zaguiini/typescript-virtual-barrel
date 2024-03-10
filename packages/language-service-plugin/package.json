@@ -1,6 +1,6 @@
 {
   "name": "@typescript-virtual-barrel/language-service-plugin",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -25,7 +25,7 @@
     "tsconfig": "*"
   },
   "dependencies": {
-    "@typescript-virtual-barrel/core": "^0.0.3",
+    "@typescript-virtual-barrel/core": ">=1.0.0",
     "typescript": "^5.4.2"
   }
 }

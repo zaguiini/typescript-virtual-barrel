@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@typescript-virtual-barrel/install",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
